@@ -29,10 +29,73 @@
  * SOFTWARE.
  */
 
+/**
+ *  @file NullStorage.php
+ *
+ *  The Null Session Driver for test purpose
+ *
+ *  @package    Platine\Session\Storage
+ *  @author Platine Developers Team
+ *  @copyright  Copyright (c) 2020
+ *  @license    http://opensource.org/licenses/MIT  MIT License
+ *  @link   http://www.iacademy.cf
+ *  @version 1.0.0
+ *  @filesource
+ */
+
 declare(strict_types=1);
 
-namespace Platine\Session\Exception;
+namespace Platine\Session\Storage;
 
-class FileSessionHandlerException extends SessionException
+/**
+ * Class NullStorage
+ * @package Platine\Session\Storage
+ */
+class NullStorage extends AbstractStorage
 {
+
+    /**
+     * {@inheritdoc}
+     * @see SessionHandlerInterface
+     */
+    public function read($sid): string
+    {
+        return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionHandlerInterface
+     */
+    public function write($sid, $data): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionHandlerInterface
+     */
+    public function destroy($sid): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionHandlerInterface
+     */
+    public function close(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionHandlerInterface
+     */
+    public function gc($maxLifetime): bool
+    {
+        return true;
+    }
 }

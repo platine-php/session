@@ -33,7 +33,8 @@ declare(strict_types=1);
 
 namespace Platine\Session\Exception;
 
-class SessionException extends \Exception
-{
+use Exception;
 
+class SessionException extends Exception
+{
 }

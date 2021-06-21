@@ -47,7 +47,9 @@ declare(strict_types=1);
 
 namespace Platine\Session;
 
-use Platine\Session\Exception\SessionException;
+use Platine\Session\Configuration;
+use Platine\Session\Storage\NullStorage;
+use Platine\Stdlib\Helper\Arr;
 use SessionHandlerInterface;
 
 class Session
@@ -60,28 +62,47 @@ class Session
     protected SessionHandlerInterface $handler;
 
     /**
-     * The session flash key name to use
-     * @var string
+     * The configuration instance
+     * @var Configuration
      */
-    protected string $flashKey = 'session_flash';
+    protected Configuration $config;
 
     /**
      * Create new Session instance
-     * @param SessionHandlerInterface $handler the session driver to use
-     * @param string $flashKey the session flash key
+     * @param Configuration|null $config the configuration to use
      */
-    public function __construct(SessionHandlerInterface $handler, string $flashKey = 'session_flash')
+    public function __construct(?Configuration $config = null)
     {
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            throw new SessionException('You don\'t need to manually start the session');
+        $this->config = $config ?? new Configuration([
+            'name' => 'PHPSESSID',
+            'driver' => 'null',
+            'ttl' => 300,
+            'flash_key' => 'session_flash',
+            'cookie' => [
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => false,
+            ],
+            'storages' => [
+                'null' => [
+                    'class' => NullStorage::class,
+                ],
+            ]
+        ]);
+
+        $storageName = $this->config->get('driver');
+        $key = sprintf('storages.%s.class', $storageName);
+        $class = $this->config->get($key);
+        $this->handler = new $class($this->config);
+
+        if ((session_status() !== PHP_SESSION_ACTIVE)) {
+            $this->init();
+            session_set_save_handler($this->handler, true);
+
+            //now start the session
+            session_start();
         }
-        $this->handler = $handler;
-        $this->flashKey = $flashKey;
-
-        session_set_save_handler($handler);
-
-        //now start the session
-        session_start();
     }
 
     /**
@@ -100,7 +121,7 @@ class Session
      */
     public function has(string $key): bool
     {
-        return array_key_exists($key, $_SESSION);
+        return Arr::has($_SESSION, $key);
     }
 
     /**
@@ -110,32 +131,36 @@ class Session
      */
     public function set(string $key, $value): void
     {
-        $_SESSION[$key] = $value;
+        Arr::set($_SESSION, $key, $value);
     }
 
     /**
      * Get the session data
      * @param string $key   the key name
-     * @param mixed $default the default value to return if can not find session data
+     * @param mixed $default the default value to return if can
+     *  not find session data
+     * @return mixed
      */
     public function get(string $key, $default = null)
     {
-        return $this->has($key) ? $_SESSION[$key] : $default;
+        return Arr::get($_SESSION, $key, $default);
     }
 
     /**
      * Return all session data
      * @param  bool $includeFlash whether to include flash data
-     * @return array
+     * @return array<string, mixed>
      */
     public function all(bool $includeFlash = false): array
     {
         $session = $_SESSION;
+        $flashKey = $this->config->get('flash_key');
         if (!$includeFlash) {
-            if (array_key_exists($this->flashKey, $session)) {
-                unset($session[$this->flashKey]);
+            if (array_key_exists($flashKey, $session)) {
+                unset($session[$flashKey]);
             }
         }
+
         return $session;
     }
 
@@ -147,30 +172,9 @@ class Session
      */
     public function remove(string $key): bool
     {
-        if (array_key_exists($key, $_SESSION)) {
-            unset($_SESSION[$key]);
-        }
+        Arr::forget($_SESSION, $key);
+
         return true;
-    }
-
-    /**
-     * Get session flash key
-     * @return string
-     */
-    public function getFlashKey(): string
-    {
-        return $this->flashKey;
-    }
-
-    /**
-     * Set session flash key to use
-     *
-     * @param string $flashKey
-     * @return void
-     */
-    public function setFlashKey(string $flashKey): void
-    {
-        $this->flashKey = $flashKey;
     }
 
     /**
@@ -180,23 +184,30 @@ class Session
      */
     public function hasFlash(string $key): bool
     {
-        $session = $this->get($this->flashKey, []);
-        return array_key_exists($key, $session);
+        $flashKey = $this->config->get('flash_key');
+        $name = sprintf('%s.%s', $flashKey, $key);
+
+        return $this->has($name);
     }
 
     /**
      * Get the session flash data
      * @param string $key   the key name
-     * @param mixed $default the default value to return if can not find session data
+     * @param mixed $default the default value to return if can
+     *  not find session data
+     * @return mixed
      */
     public function getFlash(string $key, $default = null)
     {
-        $session = $this->get($this->flashKey, []);
+        $flashKey = $this->config->get('flash_key');
+        $name = sprintf('%s.%s', $flashKey, $key);
+
         $value = $default;
-        if (array_key_exists($key, $session)) {
-            $value = $session[$key];
+        if ($this->has($name)) {
+            $value = $this->get($name);
             $this->removeFlash($key);
         }
+
         return $value;
     }
 
@@ -207,9 +218,10 @@ class Session
      */
     public function setFlash(string $key, $value): void
     {
-        $session = $this->get($this->flashKey, []);
-        $session[$key] = $value;
-        $this->set($this->flashKey, $session);
+        $flashKey = $this->config->get('flash_key');
+        $name = sprintf('%s.%s', $flashKey, $key);
+
+        $this->set($name, $value);
     }
 
     /**
@@ -220,11 +232,42 @@ class Session
      */
     public function removeFlash(string $key): bool
     {
-        $session = $this->get($this->flashKey, []);
-        if (array_key_exists($key, $session)) {
-            unset($session[$key]);
-        }
-        $this->set($this->flashKey, $session);
+        $flashKey = $this->config->get('flash_key');
+        $name = sprintf('%s.%s', $flashKey, $key);
+        $this->remove($name);
+
         return true;
+    }
+
+    /**
+     * Set the session information
+     * @return void
+     */
+    protected function init(): void
+    {
+        $sessionName = $this->config->get('name');
+        if ($sessionName) {
+            session_name($sessionName);
+        }
+
+        $lifetime = (int)$this->config->get('cookie.lifetime');
+        $path = $this->config->get('cookie.path');
+        $domain = $this->config->get('cookie.domain');
+        $secure = $this->config->get('cookie.secure');
+
+        session_set_cookie_params(
+            $lifetime,
+            $path,
+            $domain,
+            $secure,
+            // for security for access to cookie via javascript or XSS attack
+            $httponly = true
+        );
+
+        //to prevent attack of Session Fixation
+        //thank to https://www.phparch.com/2018/01/php-sessions-in-depth/
+        ini_set('session.use_strict_mode', '1');
+        ini_set('session.use_only_cookies', '1');
+        ini_set('session.use_trans_sid', '0');
     }
 }

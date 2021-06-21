@@ -29,10 +29,55 @@
  * SOFTWARE.
  */
 
+/**
+ *  @file AbstractStorage.php
+ *
+ *  The base storage class that contains the implementation of common features
+ *
+ *  @package    Platine\Session\Storage
+ *  @author Platine Developers Team
+ *  @copyright  Copyright (c) 2020
+ *  @license    http://opensource.org/licenses/MIT  MIT License
+ *  @link   http://www.iacademy.cf
+ *  @version 1.0.0
+ *  @filesource
+ */
+
 declare(strict_types=1);
 
-namespace Platine\Session\Exception;
+namespace Platine\Session\Storage;
 
-class FileSessionHandlerException extends SessionException
+use Platine\Session\Configuration;
+use SessionHandlerInterface;
+
+/**
+ * Class AbstractStorage
+ * @package Platine\Session\Storage
+ */
+abstract class AbstractStorage implements SessionHandlerInterface
 {
+
+    /**
+     * The cache configuration
+     * @var Configuration
+     */
+    protected Configuration $config;
+
+    /**
+     * Create new instance
+     * @param Configuration $config
+     */
+    public function __construct(Configuration $config)
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionHandlerInterface
+     */
+    public function open($path, $name): bool
+    {
+        return true;
+    }
 }
