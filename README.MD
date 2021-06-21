@@ -21,6 +21,7 @@ composer require platine-php/session
 
 ### Supported drivers 
 - **File**
+- **APCu**
 
 
 ### License
