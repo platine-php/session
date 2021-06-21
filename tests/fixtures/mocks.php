@@ -12,7 +12,7 @@ $mock_time = false;
 $mock_file_exists = false;
 $mock_unlink = false;
 
-function unlink(string $filename, resource $context = null)
+function unlink(string $filename, $context = null)
 {
     global $mock_unlink;
     if ($mock_unlink) {
