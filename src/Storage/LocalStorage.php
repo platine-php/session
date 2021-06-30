@@ -47,7 +47,6 @@ declare(strict_types=1);
 
 namespace Platine\Session\Storage;
 
-use Platine\Filesystem\Adapter\Local\LocalAdapter;
 use Platine\Filesystem\DirectoryInterface;
 use Platine\Filesystem\FileInterface;
 use Platine\Filesystem\Filesystem;
@@ -77,18 +76,24 @@ class LocalStorage extends AbstractStorage
 
     /**
      * Create new instance
+     * @param Filesystem $filesystem
      * @param Configuration $config
      * @throws FileSessionHandlerException
      */
-    public function __construct(Configuration $config)
+    public function __construct(Filesystem $filesystem, ?Configuration $config = null)
     {
         parent::__construct($config);
 
-        $path = $config->get('storages.file.path');
-        $filePath = Path::realPath($path);
+        $path = $this->config->get('storages.file.path');
+        $filePath = Path::normalizePath($path, true);
+        $directory = $filesystem->directory($filePath);
 
-        $filesystem = new Filesystem(new LocalAdapter($filePath));
-        $directory = $filesystem->directory();
+        if (!$directory->exists()) {
+            throw new FileSessionHandlerException(sprintf(
+                'The directory [%s] does not exist',
+                $directory->getPath()
+            ));
+        }
 
         $this->filesystem = $filesystem;
         $this->directory = $directory;

@@ -69,32 +69,16 @@ class Session
 
     /**
      * Create new Session instance
+     * @param SessionHandlerInterface|null $handler the handler to use
      * @param Configuration|null $config the configuration to use
      */
-    public function __construct(?Configuration $config = null)
-    {
-        $this->config = $config ?? new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
+    public function __construct(
+        ?SessionHandlerInterface $handler = null,
+        ?Configuration $config = null
+    ) {
+        $this->config = $config ?? new Configuration([]);
 
-        $storageName = $this->config->get('driver');
-        $key = sprintf('storages.%s.class', $storageName);
-        $class = $this->config->get($key);
-        $this->handler = new $class($this->config);
+        $this->handler = $handler ?? new NullStorage($config);
 
         if ((session_status() !== PHP_SESSION_ACTIVE)) {
             $this->init();

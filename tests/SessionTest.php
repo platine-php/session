@@ -7,8 +7,8 @@ namespace Platine\Test\Session;
 use org\bovigo\vfs\vfsStream;
 use Platine\Dev\PlatineTestCase;
 use Platine\Session\Configuration;
-use Platine\Session\Exception\SessionException;
 use Platine\Session\Session;
+use Platine\Session\Storage\LocalStorage;
 use Platine\Session\Storage\NullStorage;
 use stdClass;
 
@@ -40,54 +40,20 @@ class SessionTest extends PlatineTestCase
             Configuration::class,
             $this->getPropertyValue(Session::class, $s, 'config')
         );
+        $this->assertInstanceOf(NullStorage::class, $s->getHandler());
     }
 
-    public function testConstructor(): void
+    public function testConstructorCustom(): void
     {
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
-        $this->assertInstanceOf(
-            NullStorage::class,
-            $this->getPropertyValue(Session::class, $s, 'handler')
-        );
+        $cfg = new Configuration([]);
+        $handler = $this->getMockInstance(LocalStorage::class);
+        $s = new Session($handler, $cfg);
+        $this->assertInstanceOf(LocalStorage::class, $s->getHandler());
     }
 
     public function testGetHandler(): void
     {
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+        $s = new Session();
         $this->assertInstanceOf(NullStorage::class, $s->getHandler());
     }
 
@@ -102,24 +68,8 @@ class SessionTest extends PlatineTestCase
             'float' => 10.1
         );
 
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $this->assertTrue($s->has('array'));
         $this->assertFalse($s->has('not_found'));
     }
@@ -135,24 +85,8 @@ class SessionTest extends PlatineTestCase
             'float' => 10.1
         );
 
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $value = $s->get('foo');
         $this->assertNull($value);
     }
@@ -168,24 +102,8 @@ class SessionTest extends PlatineTestCase
             'float' => 10.1
         );
 
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $value = $s->get('foo', 'bar');
         $this->assertSame($value, 'bar');
     }
@@ -201,48 +119,16 @@ class SessionTest extends PlatineTestCase
             'float' => 10.1
         );
 
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $value = 100;
         $this->assertEquals($value, $s->get('int'));
     }
 
     public function testSetValue(): void
     {
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
 
         //string
         $value = 'bar';
@@ -315,24 +201,8 @@ class SessionTest extends PlatineTestCase
             'session_flash' => array('fkey1' => 'foo')
         );
 
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
 
         //Not include flash
         $result = $s->all();
@@ -358,24 +228,8 @@ class SessionTest extends PlatineTestCase
             'float' => 10.1,
             'session_flash' => array('fkey1' => 'foo')
         );
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $this->assertTrue($s->hasFlash('fkey1'));
         $this->assertFalse($s->hasFlash('not_found'));
     }
@@ -391,47 +245,15 @@ class SessionTest extends PlatineTestCase
             'float' => 10.1,
             'session_flash' => array('fkey1' => 'foo')
         );
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $this->assertEquals('foo', $s->getFlash('fkey1'));
     }
 
     public function testGetFlashUsingDefaultValue(): void
     {
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $this->assertEquals('bar', $s->getFlash('not_found', 'bar'));
     }
 
@@ -447,24 +269,9 @@ class SessionTest extends PlatineTestCase
             'session_flash' => array('fkey1' => 'foo')
         );
 
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+
+        $s = new Session();
 
         //string
         $value = 'bar';
@@ -519,24 +326,8 @@ class SessionTest extends PlatineTestCase
 
     public function testRemoveKeyNotExist(): void
     {
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $result = $s->remove('test');
         $this->assertTrue($result);
     }
@@ -552,24 +343,8 @@ class SessionTest extends PlatineTestCase
             'float' => 10.1,
             'session_flash' => array('fkey1' => 'foo')
         );
-        $cfg = new Configuration([
-            'name' => 'PHPSESSID',
-            'driver' => 'null',
-            'ttl' => 300,
-            'flash_key' => 'session_flash',
-            'cookie' => [
-                'lifetime' => 0,
-                'path' => '/',
-                'domain' => '',
-                'secure' => false,
-            ],
-            'storages' => [
-                'null' => [
-                    'class' => NullStorage::class,
-                ],
-            ]
-        ]);
-        $s = new Session($cfg);
+
+        $s = new Session();
         $this->assertEquals(true, $s->get('bool_true'));
         $s->remove('bool_true');
         $this->assertNull($s->get('bool_true'));

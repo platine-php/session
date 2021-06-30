@@ -75,11 +75,36 @@ class Configuration extends AbstractConfiguration
             'storages.file' => 'array',
             'storages.file.path' => 'string',
             'storages.file.prefix' => 'string',
-            'storages.file.class' => 'string',
             'storages.apcu' => 'array',
-            'storages.apcu.class' => 'string',
             'storages.null' => 'array',
-            'storages.null.class' => 'string',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefault(): array
+    {
+        return [
+        'name' => 'PHPSESSID',
+        'driver' => 'file',
+        'ttl' => 300,
+        'flash_key' => 'session_flash',
+        'cookie' => [
+            'lifetime' => 0,
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
+        ],
+        'storages' => [
+            'file' => [
+                'path' => 'session',
+                'prefix' => 'sess_',
+            ],
+            'apcu' => [],
+            'null' => [],
+        ]
+
         ];
     }
 }

@@ -63,7 +63,7 @@ class ApcuStorage extends AbstractStorage
      *
      * Create new instance
      */
-    public function __construct(Configuration $config)
+    public function __construct(?Configuration $config = null)
     {
         if ((!extension_loaded('apcu')) || !((bool) ini_get('apc.enabled'))) {
             throw new SessionException('The session for APCu driver is not available.'

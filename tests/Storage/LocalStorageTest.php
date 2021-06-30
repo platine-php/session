@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Platine\Test\Session;
 
-use InvalidArgumentException;
 use org\bovigo\vfs\vfsStream;
 use Platine\Dev\PlatineTestCase;
+use Platine\Filesystem\Adapter\Local\LocalAdapter;
 use Platine\Filesystem\DirectoryInterface;
 use Platine\Filesystem\Filesystem;
 use Platine\Session\Configuration;
@@ -38,6 +38,8 @@ class LocalStorageTest extends PlatineTestCase
         global $mock_realpath_to_same;
         $mock_realpath_to_same = true;
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -51,17 +53,16 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
 
-
-
-        $ls = new LocalStorage($cfg);
+        $ls = new LocalStorage($fs, $cfg);
 
         $this->assertInstanceOf(
             DirectoryInterface::class,
@@ -84,25 +85,8 @@ class LocalStorageTest extends PlatineTestCase
         global $mock_realpath_to_same;
         $mock_realpath_to_same = true;
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(FileSessionHandlerException::class);
         $path = 'path/not/found';
-        $cfg = new Configuration([
-            'storages' => [
-                'file' => [
-                    'path' => $path,
-                    'prefix' => 'cache_',
-                ],
-            ]
-        ]);
-
-        (new LocalStorage($cfg));
-    }
-
-
-    public function testGetFilename(): void
-    {
-        global $mock_realpath_to_same;
-        $mock_realpath_to_same = true;
 
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
@@ -117,13 +101,49 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
-        $ls = new LocalStorage($cfg);
+
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        (new LocalStorage($fs, $cfg));
+    }
+
+
+    public function testGetFilename(): void
+    {
+        global $mock_realpath_to_same;
+        $mock_realpath_to_same = true;
+
+        $path = $this->vfsPath->url();
+
+        $cfg = new Configuration([
+            'name' => 'PHPSESSID',
+            'driver' => 'file',
+            'ttl' => 300,
+            'flash_key' => 'session_flash',
+            'cookie' => [
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => false,
+            ],
+            'storages' => [
+                'file' => [
+                    'path' => $path,
+                    'prefix' => 'sess_',
+                ],
+            ]
+        ]);
+
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
 
         $key = 'foo';
         $file = $this->runPrivateProtectedMethod($ls, 'getFileName', array($key));
@@ -136,6 +156,8 @@ class LocalStorageTest extends PlatineTestCase
         global $mock_realpath_to_same;
         $mock_realpath_to_same = true;
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -149,14 +171,16 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
-        $ls = new LocalStorage($cfg);
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
         $this->assertTrue($ls->open('foo', 'sid'));
     }
 
@@ -165,6 +189,8 @@ class LocalStorageTest extends PlatineTestCase
         global $mock_realpath_to_same;
         $mock_realpath_to_same = true;
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -178,17 +204,16 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
 
-
-
-        $ls = new LocalStorage($cfg);
+        $ls = new LocalStorage($fs, $cfg);
         $this->assertTrue($ls->close());
     }
 
@@ -200,6 +225,8 @@ class LocalStorageTest extends PlatineTestCase
         $sid = uniqid();
         $data = serialize(array('foo' => 'bar'));
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -213,14 +240,16 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
-        $ls = new LocalStorage($cfg);
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
         $ls->write($sid, $data);
         $this->assertEquals($data, $ls->read($sid));
         $ls->destroy($sid);
@@ -234,6 +263,8 @@ class LocalStorageTest extends PlatineTestCase
 
         $sid = uniqid();
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -247,14 +278,16 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
-        $ls = new LocalStorage($cfg);
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
         $ls->destroy($sid);
         $this->assertEmpty($ls->read($sid));
     }
@@ -267,6 +300,8 @@ class LocalStorageTest extends PlatineTestCase
         $sid = uniqid();
         $data = serialize(array('foo' => 'bar'));
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -280,19 +315,22 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
-        $ls = new LocalStorage($cfg);
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
         $result = $ls->write($sid, $data);
         $this->assertTrue($result);
 
         $this->assertEquals($data, $ls->read($sid));
     }
+
 
     public function testRead(): void
     {
@@ -306,6 +344,8 @@ class LocalStorageTest extends PlatineTestCase
                 ->at($this->vfsPath)
                 ->setContent($expectedContent);
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -319,14 +359,17 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
-        $ls = new LocalStorage($cfg);
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
+
         $content = $ls->read($sid);
         $this->assertEquals($expectedContent, $content);
     }
@@ -338,6 +381,8 @@ class LocalStorageTest extends PlatineTestCase
 
         $sid = uniqid();
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -351,14 +396,16 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
-        $ls = new LocalStorage($cfg);
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
         $content = $ls->read($sid);
         $this->assertEmpty($content);
     }
@@ -375,6 +422,8 @@ class LocalStorageTest extends PlatineTestCase
 
         $data = serialize(array('foo' => 'bar'));
 
+        $path = $this->vfsPath->url();
+
         $cfg = new Configuration([
             'name' => 'PHPSESSID',
             'driver' => 'file',
@@ -388,14 +437,16 @@ class LocalStorageTest extends PlatineTestCase
             ],
             'storages' => [
                 'file' => [
-                    'class' => LocalStorage::class,
-                    'path' => $this->vfsPath->url(),
+                    'path' => $path,
                     'prefix' => 'sess_',
                 ],
             ]
         ]);
 
-        $ls = new LocalStorage($cfg);
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
         $ls->write($sid, $data);
 
 
