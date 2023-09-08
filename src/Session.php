@@ -38,7 +38,7 @@
  *  @author Platine Developers Team
  *  @copyright  Copyright (c) 2020
  *  @license    http://opensource.org/licenses/MIT  MIT License
- *  @link   http://www.iacademy.cf
+ *  @link   https://www.platine-php.com
  *  @version 1.0.0
  *  @filesource
  */
@@ -54,7 +54,6 @@ use SessionHandlerInterface;
 
 class Session
 {
-
     /**
      * The session driver to use
      * @var SessionHandlerInterface
@@ -239,14 +238,14 @@ class Session
         $domain = $this->config->get('cookie.domain');
         $secure = $this->config->get('cookie.secure');
 
-        session_set_cookie_params(
-            $lifetime,
-            $path,
-            $domain,
-            $secure,
-            // for security for access to cookie via javascript or XSS attack
-            $httponly = true
-        );
+        session_set_cookie_params([
+            'lifetime' => $lifetime,
+            'path' => $path,
+            'domain' => $domain,
+            'secure' => $secure,
+            'httponly' => true, // for security for access to cookie via javascript or XSS attack
+            'samesite' => 'Lax'
+        ]);
 
         //to prevent attack of Session Fixation
         //thank to https://www.phparch.com/2018/01/php-sessions-in-depth/

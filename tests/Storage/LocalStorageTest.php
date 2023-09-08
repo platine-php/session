@@ -21,7 +21,6 @@ use Platine\Session\Storage\LocalStorage;
  */
 class LocalStorageTest extends PlatineTestCase
 {
-
     protected $vfsRoot;
     protected $vfsPath;
 

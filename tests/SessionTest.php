@@ -20,7 +20,6 @@ use stdClass;
  */
 class SessionTest extends PlatineTestCase
 {
-
     protected $vfsRoot;
     protected $vfsSessionPath;
 

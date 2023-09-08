@@ -16,7 +16,6 @@ use Platine\Session\Storage\NullStorage;
  */
 class NullStorageTest extends PlatineTestCase
 {
-
     public function testRead(): void
     {
         $cfg = $this->getMockInstance(Configuration::class);
