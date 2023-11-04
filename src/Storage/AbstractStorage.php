@@ -80,7 +80,7 @@ abstract class AbstractStorage implements SessionHandlerInterface, SessionUpdate
     {
         return true;
     }
-    
+
     /**
      * {@inheritdoc}
      * @see SessionUpdateTimestampHandlerInterface

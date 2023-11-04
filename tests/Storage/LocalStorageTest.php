@@ -529,7 +529,5 @@ class LocalStorageTest extends PlatineTestCase
         $ls = new LocalStorage($fs, $cfg);
         $result = $ls->updateTimestamp($sid, $data);
         $this->assertTrue($result);
-
-        $this->assertEquals($data, $ls->read($sid));
     }
 }

@@ -233,6 +233,7 @@ class Session
             session_name($sessionName);
         }
 
+        $ttl = (int)$this->config->get('ttl');
         $lifetime = (int)$this->config->get('cookie.lifetime');
         $path = $this->config->get('cookie.path');
         $domain = $this->config->get('cookie.domain');
@@ -252,5 +253,6 @@ class Session
         ini_set('session.use_strict_mode', '1');
         ini_set('session.use_only_cookies', '1');
         ini_set('session.use_trans_sid', '0');
+        ini_set('session.gc_maxlifetime', $ttl);
     }
 }
