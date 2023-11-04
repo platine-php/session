@@ -123,4 +123,25 @@ class ApcuStorage extends AbstractStorage
 
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionUpdateTimestampHandlerInterface
+     */
+    public function updateTimestamp($sid, $data): bool
+    {
+        return $this->write($sid, $data);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionUpdateTimestampHandlerInterface
+     */
+    public function validateId($sid): bool
+    {
+        $success = false;
+        apcu_fetch($sid, $success);
+
+        return $success;
+    }
 }

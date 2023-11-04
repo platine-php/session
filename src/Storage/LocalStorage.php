@@ -179,6 +179,31 @@ class LocalStorage extends AbstractStorage
     }
 
     /**
+     * {@inheritdoc}
+     * @see SessionUpdateTimestampHandlerInterface
+     */
+    public function updateTimestamp($sid, $data): bool
+    {
+        $file = $this->getSessionFile($sid);
+        /** @var int */
+        $expireAt = time() + (int) $this->config->get('ttl');
+
+        $file->touch($expireAt);
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionUpdateTimestampHandlerInterface
+     */
+    public function validateId($sid): bool
+    {
+        return $this->getSessionFile($sid)
+                    ->exists();
+    }
+
+    /**
      * Return the file session
      * @param string $sid
      * @return FileInterface

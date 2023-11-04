@@ -62,4 +62,22 @@ class NullStorageTest extends PlatineTestCase
 
         $this->assertTrue($ac->gc(1200));
     }
+
+    public function testUpdateTimestamp(): void
+    {
+        $cfg = $this->getMockInstance(Configuration::class);
+
+        $ac = new NullStorage($cfg);
+
+        $this->assertTrue($ac->updateTimestamp('sid', 'data'));
+    }
+
+    public function testValidateId(): void
+    {
+        $cfg = $this->getMockInstance(Configuration::class);
+
+        $ac = new NullStorage($cfg);
+
+        $this->assertTrue($ac->validateId('sid'));
+    }
 }

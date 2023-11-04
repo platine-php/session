@@ -49,12 +49,13 @@ namespace Platine\Session\Storage;
 
 use Platine\Session\Configuration;
 use SessionHandlerInterface;
+use SessionUpdateTimestampHandlerInterface;
 
 /**
  * Class AbstractStorage
  * @package Platine\Session\Storage
  */
-abstract class AbstractStorage implements SessionHandlerInterface
+abstract class AbstractStorage implements SessionHandlerInterface, SessionUpdateTimestampHandlerInterface
 {
     /**
      * The cache configuration
@@ -76,6 +77,24 @@ abstract class AbstractStorage implements SessionHandlerInterface
      * @see SessionHandlerInterface
      */
     public function open($path, $name): bool
+    {
+        return true;
+    }
+    
+    /**
+     * {@inheritdoc}
+     * @see SessionUpdateTimestampHandlerInterface
+     */
+    public function updateTimestamp($sid, $data): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see SessionUpdateTimestampHandlerInterface
+     */
+    public function validateId($sid): bool
     {
         return true;
     }

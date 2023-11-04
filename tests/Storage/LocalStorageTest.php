@@ -452,4 +452,84 @@ class LocalStorageTest extends PlatineTestCase
         $result = $ls->gc(-9999999);
         $this->assertTrue($result);
     }
+
+    public function testValidateId(): void
+    {
+        global $mock_realpath_to_same;
+        $mock_realpath_to_same = true;
+
+        $sid = uniqid();
+        $filename = 'sess_' . $sid;
+        $expectedContent = serialize(array('foo' => 'bar'));
+        vfsStream::newFile($filename)
+                ->at($this->vfsPath)
+                ->setContent($expectedContent);
+
+        $path = $this->vfsPath->url();
+
+        $cfg = new Configuration([
+            'name' => 'PHPSESSID',
+            'driver' => 'file',
+            'ttl' => 300,
+            'flash_key' => 'session_flash',
+            'cookie' => [
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => false,
+            ],
+            'storages' => [
+                'file' => [
+                    'path' => $path,
+                    'prefix' => 'sess_',
+                ],
+            ]
+        ]);
+
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
+
+        $this->assertTrue($ls->validateId($sid));
+    }
+
+    public function testUpdateTimestamp(): void
+    {
+        global $mock_realpath_to_same;
+        $mock_realpath_to_same = true;
+
+        $sid = uniqid();
+        $data = serialize(array('foo' => 'bar'));
+
+        $path = $this->vfsPath->url();
+
+        $cfg = new Configuration([
+            'name' => 'PHPSESSID',
+            'driver' => 'file',
+            'ttl' => 300,
+            'flash_key' => 'session_flash',
+            'cookie' => [
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => false,
+            ],
+            'storages' => [
+                'file' => [
+                    'path' => $path,
+                    'prefix' => 'sess_',
+                ],
+            ]
+        ]);
+
+        $adapter = new LocalAdapter();
+        $fs = new Filesystem($adapter);
+
+        $ls = new LocalStorage($fs, $cfg);
+        $result = $ls->updateTimestamp($sid, $data);
+        $this->assertTrue($result);
+
+        $this->assertEquals($data, $ls->read($sid));
+    }
 }

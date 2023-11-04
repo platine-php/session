@@ -198,4 +198,51 @@ class ApcuStorageTest extends PlatineTestCase
 
         $this->assertTrue($ac->gc(1200));
     }
+
+    public function testUpdateTimestamp(): void
+    {
+        global $mock_extension_loaded_to_true,
+        $mock_ini_get_to_true,
+        $mock_apcu_store_to_true;
+
+        $key = uniqid();
+        $data = array('foo' => 'bar');
+
+        $mock_extension_loaded_to_true = true;
+        $mock_ini_get_to_true = true;
+        $mock_apcu_store_to_true = true;
+
+        $cfg = new Configuration([
+            'ttl' => 89,
+            'storages' => []
+        ]);
+
+        $ac = new ApcuStorage($cfg);
+        $result = $ac->updateTimestamp($key, $data);
+        $this->assertTrue($result);
+    }
+
+    public function testValidateId(): void
+    {
+        global $mock_extension_loaded_to_true,
+        $mock_ini_get_to_true,
+        $mock_apcu_fetch_to_false;
+
+        $mock_extension_loaded_to_true = true;
+        $mock_ini_get_to_true = true;
+
+        $cfg = $this->getMockInstance(Configuration::class);
+
+        $ac = new ApcuStorage($cfg);
+
+        $mock_apcu_fetch_to_false = true;
+        //Default value
+        $this->assertFalse($ac->validateId('not_found_key'));
+
+        $mock_apcu_fetch_to_false = false;
+        //Return correct data
+        $key = uniqid();
+
+        $this->assertTrue($ac->validateId($key));
+    }
 }
