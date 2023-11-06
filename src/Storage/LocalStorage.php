@@ -107,7 +107,7 @@ class LocalStorage extends AbstractStorage
     {
         $file = $this->getSessionFile($sid);
 
-        if (!$file->exists()) {
+        if (!$file->exists() || time() > $file->getMtime()) {
             return '';
         }
 
