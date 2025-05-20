@@ -50,7 +50,7 @@ namespace Platine\Session;
 use Platine\Stdlib\Config\AbstractConfiguration;
 
 /**
- * Class Configuration
+ * @class Configuration
  * @package Platine\Session
  */
 class Configuration extends AbstractConfiguration
@@ -85,25 +85,24 @@ class Configuration extends AbstractConfiguration
     public function getDefault(): array
     {
         return [
-        'name' => 'PHPSESSID',
-        'driver' => 'file',
-        'ttl' => 300,
-        'flash_key' => 'session_flash',
-        'cookie' => [
-            'lifetime' => 0,
-            'path' => '/',
-            'domain' => '',
-            'secure' => false,
-        ],
-        'storages' => [
-            'file' => [
-                'path' => 'session',
-                'prefix' => 'sess_',
+            'name' => 'PHPSESSID',
+            'driver' => 'file',
+            'ttl' => 300,
+            'flash_key' => 'session_flash',
+            'cookie' => [
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => false,
             ],
-            'apcu' => [],
-            'null' => [],
-        ]
-
+            'storages' => [
+                'file' => [
+                    'path' => 'session',
+                    'prefix' => 'sess_',
+                ],
+                'apcu' => [],
+                'null' => [],
+            ]
         ];
     }
 }

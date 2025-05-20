@@ -57,7 +57,7 @@ use Platine\Stdlib\Helper\Str;
 use SessionHandlerInterface;
 
 /**
- * Class LocalStorage
+ * @class LocalStorage
  * @package Platine\Session\Storage
  */
 class LocalStorage extends AbstractStorage
@@ -77,7 +77,7 @@ class LocalStorage extends AbstractStorage
     /**
      * Create new instance
      * @param Filesystem $filesystem
-     * @param Configuration $config
+     * @param Configuration|null $config
      * @throws FileSessionHandlerException
      */
     public function __construct(Filesystem $filesystem, ?Configuration $config = null)
@@ -88,7 +88,7 @@ class LocalStorage extends AbstractStorage
         $filePath = Path::normalizePath($path, true);
         $directory = $filesystem->directory($filePath);
 
-        if (!$directory->exists()) {
+        if ($directory->exists() === false) {
             throw new FileSessionHandlerException(sprintf(
                 'The directory [%s] does not exist',
                 $directory->getPath()
@@ -103,11 +103,11 @@ class LocalStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function read($sid): string
+    public function read(string $sid): string|false
     {
         $file = $this->getSessionFile($sid);
 
-        if (!$file->exists() || time() > $file->getMtime()) {
+        if ($file->exists() === false || time() > $file->getMtime()) {
             return '';
         }
 
@@ -118,7 +118,7 @@ class LocalStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function write($sid, $data): bool
+    public function write(string $sid, string $data): bool
     {
         $file = $this->getSessionFile($sid);
         $file->write($data);
@@ -135,7 +135,7 @@ class LocalStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function destroy($sid): bool
+    public function destroy(string $sid): bool
     {
         $file = $this->getSessionFile($sid);
 
@@ -159,7 +159,7 @@ class LocalStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function gc($maxLifetime): bool
+    public function gc(int $maxLifetime): bool
     {
         $files = $this->directory->read(DirectoryInterface::FILE);
         foreach ($files as /** @var FileInterface $file */ $file) {
@@ -182,7 +182,7 @@ class LocalStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionUpdateTimestampHandlerInterface
      */
-    public function updateTimestamp($sid, $data): bool
+    public function updateTimestamp(string $sid, string $data): bool
     {
         $file = $this->getSessionFile($sid);
         /** @var int */
@@ -197,7 +197,7 @@ class LocalStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionUpdateTimestampHandlerInterface
      */
-    public function validateId($sid): bool
+    public function validateId(string $sid): bool
     {
         return $this->getSessionFile($sid)
                     ->exists();
@@ -221,7 +221,7 @@ class LocalStorage extends AbstractStorage
     /**
      * Get session file name for given key
      * @param  string $sid
-     * @return string      the filename
+     * @return string  the filename
      */
     private function getFileName(string $sid): string
     {

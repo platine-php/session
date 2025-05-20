@@ -48,7 +48,7 @@ declare(strict_types=1);
 namespace Platine\Session\Storage;
 
 /**
- * Class NullStorage
+ * @class NullStorage
  * @package Platine\Session\Storage
  */
 class NullStorage extends AbstractStorage
@@ -57,7 +57,7 @@ class NullStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function read($sid): string
+    public function read(string $sid): string|false
     {
         return '';
     }
@@ -66,7 +66,7 @@ class NullStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function write($sid, $data): bool
+    public function write(string $sid, string $data): bool
     {
         return true;
     }
@@ -75,7 +75,7 @@ class NullStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function destroy($sid): bool
+    public function destroy(string $sid): bool
     {
         return true;
     }
@@ -93,7 +93,7 @@ class NullStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function gc($maxLifetime): bool
+    public function gc(int $maxLifetime): bool
     {
         return true;
     }

@@ -52,7 +52,7 @@ use SessionHandlerInterface;
 use SessionUpdateTimestampHandlerInterface;
 
 /**
- * Class AbstractStorage
+ * @class AbstractStorage
  * @package Platine\Session\Storage
  */
 abstract class AbstractStorage implements SessionHandlerInterface, SessionUpdateTimestampHandlerInterface
@@ -76,7 +76,7 @@ abstract class AbstractStorage implements SessionHandlerInterface, SessionUpdate
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function open($path, $name): bool
+    public function open(string $path, string $name): bool
     {
         return true;
     }
@@ -85,7 +85,7 @@ abstract class AbstractStorage implements SessionHandlerInterface, SessionUpdate
      * {@inheritdoc}
      * @see SessionUpdateTimestampHandlerInterface
      */
-    public function updateTimestamp($sid, $data): bool
+    public function updateTimestamp(string $sid, string $data): bool
     {
         return true;
     }
@@ -94,7 +94,7 @@ abstract class AbstractStorage implements SessionHandlerInterface, SessionUpdate
      * {@inheritdoc}
      * @see SessionUpdateTimestampHandlerInterface
      */
-    public function validateId($sid): bool
+    public function validateId(string $sid): bool
     {
         return true;
     }

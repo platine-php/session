@@ -76,7 +76,6 @@ class Session
         ?Configuration $config = null
     ) {
         $this->config = $config ?? new Configuration([]);
-
         $this->handler = $handler ?? new NullStorage($config);
 
         if ((session_status() !== PHP_SESSION_ACTIVE)) {
@@ -112,7 +111,7 @@ class Session
      * @param string $key   the key name
      * @param mixed $value the session data value
      */
-    public function set(string $key, $value): void
+    public function set(string $key, mixed $value): void
     {
         Arr::set($_SESSION, $key, $value);
     }
@@ -124,7 +123,7 @@ class Session
      *  not find session data
      * @return mixed
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         return Arr::get($_SESSION, $key, $default);
     }
@@ -180,7 +179,7 @@ class Session
      *  not find session data
      * @return mixed
      */
-    public function getFlash(string $key, $default = null)
+    public function getFlash(string $key, mixed $default = null): mixed
     {
         $flashKey = $this->config->get('flash_key');
         $name = sprintf('%s.%s', $flashKey, $key);
@@ -199,7 +198,7 @@ class Session
      * @param string $key   the key name
      * @param mixed $value the session data value
      */
-    public function setFlash(string $key, $value): void
+    public function setFlash(string $key, mixed $value): void
     {
         $flashKey = $this->config->get('flash_key');
         $name = sprintf('%s.%s', $flashKey, $key);
@@ -244,7 +243,7 @@ class Session
             'path' => $path,
             'domain' => $domain,
             'secure' => $secure,
-            'httponly' => true, // for security for access to cookie via javascript or XSS attack
+            'httponly' => true, // for security to prevent access to cookie via javascript or XSS attack
             'samesite' => 'Lax'
         ]);
 

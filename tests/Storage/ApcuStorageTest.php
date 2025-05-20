@@ -91,7 +91,7 @@ class ApcuStorageTest extends PlatineTestCase
         $mock_apcu_store_to_true;
 
         $key = uniqid();
-        $data = array('foo' => 'bar');
+        $data = 'foo';
 
         $mock_extension_loaded_to_true = true;
         $mock_ini_get_to_true = true;
@@ -206,7 +206,7 @@ class ApcuStorageTest extends PlatineTestCase
         $mock_apcu_store_to_true;
 
         $key = uniqid();
-        $data = array('foo' => 'bar');
+        $data = 'foo';
 
         $mock_extension_loaded_to_true = true;
         $mock_ini_get_to_true = true;

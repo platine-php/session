@@ -35,6 +35,10 @@ namespace Platine\Session\Exception;
 
 use Exception;
 
+/**
+ * @class SessionException
+ * @package Platine\Session\Exception
+ */
 class SessionException extends Exception
 {
 }

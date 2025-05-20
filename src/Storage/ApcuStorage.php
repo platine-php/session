@@ -52,7 +52,7 @@ use Platine\Session\Exception\SessionException;
 use SessionHandlerInterface;
 
 /**
- * Class ApcuStorage
+ * @class ApcuStorage
  * @package Platine\Session\Storage
  */
 class ApcuStorage extends AbstractStorage
@@ -76,7 +76,7 @@ class ApcuStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function read($sid): string
+    public function read(string $sid): string|false
     {
         $success = false;
         /** @var mixed */
@@ -89,7 +89,7 @@ class ApcuStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function write($sid, $data): bool
+    public function write(string $sid, string $data): bool
     {
         /** @var bool */
         return apcu_store($sid, $data, (int) $this->config->get('ttl'));
@@ -99,7 +99,7 @@ class ApcuStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function destroy($sid): bool
+    public function destroy(string $sid): bool
     {
         return apcu_delete($sid) === true;
     }
@@ -117,7 +117,7 @@ class ApcuStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function gc($maxLifetime): bool
+    public function gc(int $maxLifetime): bool
     {
         //APCU will do automatically
 
@@ -128,7 +128,7 @@ class ApcuStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionUpdateTimestampHandlerInterface
      */
-    public function updateTimestamp($sid, $data): bool
+    public function updateTimestamp(string $sid, string $data): bool
     {
         return $this->write($sid, $data);
     }
@@ -137,7 +137,7 @@ class ApcuStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionUpdateTimestampHandlerInterface
      */
-    public function validateId($sid): bool
+    public function validateId(string $sid): bool
     {
         $success = false;
         apcu_fetch($sid, $success);

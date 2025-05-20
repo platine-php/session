@@ -33,6 +33,10 @@ declare(strict_types=1);
 
 namespace Platine\Session\Exception;
 
+/**
+ * @class FileSessionHandlerException
+ * @package Platine\Session\Exception
+ */
 class FileSessionHandlerException extends SessionException
 {
 }
