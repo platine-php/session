@@ -21,7 +21,7 @@
     "require": {
         "php": "^8",
         "platine-php/filesystem": "^2.0",
-        "platine-php/stdlib": "^1.0"
+        "platine-php/stdlib": "^2.0"
     },
 	
     "require-dev": {
