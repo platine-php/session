@@ -117,11 +117,11 @@ class ApcuStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function gc(int $maxLifetime): bool
+    public function gc(int $maxLifetime): int|false
     {
         //APCU will do automatically
 
-        return true;
+        return 0;
     }
 
     /**

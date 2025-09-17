@@ -60,7 +60,7 @@ class NullStorageTest extends PlatineTestCase
 
         $ac = new NullStorage($cfg);
 
-        $this->assertTrue($ac->gc(1200));
+        $this->assertEquals(0, $ac->gc(1200));
     }
 
     public function testUpdateTimestamp(): void

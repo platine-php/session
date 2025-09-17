@@ -159,8 +159,9 @@ class LocalStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
-    public function gc(int $maxLifetime): bool
+    public function gc(int $maxLifetime): int|false
     {
+        $count = 0;
         $files = $this->directory->read(DirectoryInterface::FILE);
         foreach ($files as /** @var FileInterface $file */ $file) {
             if (
@@ -171,11 +172,12 @@ class LocalStorage extends AbstractStorage
             ) {
                 if ($file->getMtime() + $maxLifetime < time()) {
                     $file->delete();
+                    $count++;
                 }
             }
         }
 
-        return true;
+        return $count;
     }
 
     /**

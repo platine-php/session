@@ -196,7 +196,7 @@ class ApcuStorageTest extends PlatineTestCase
 
         $ac = new ApcuStorage($cfg);
 
-        $this->assertTrue($ac->gc(1200));
+        $this->assertEquals(0, $ac->gc(1200));
     }
 
     public function testUpdateTimestamp(): void

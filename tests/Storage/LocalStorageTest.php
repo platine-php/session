@@ -450,7 +450,7 @@ class LocalStorageTest extends PlatineTestCase
 
 
         $result = $ls->gc(-9999999);
-        $this->assertTrue($result);
+        $this->assertEquals(1, $result);
     }
 
     public function testValidateId(): void
