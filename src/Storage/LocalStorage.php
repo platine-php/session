@@ -159,6 +159,7 @@ class LocalStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
+    #[\ReturnTypeWillChange]
     public function gc($maxLifetime): bool
     {
         $files = $this->directory->read(DirectoryInterface::FILE);

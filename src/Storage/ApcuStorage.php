@@ -117,6 +117,7 @@ class ApcuStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
+    #[\ReturnTypeWillChange]
     public function gc($maxLifetime): bool
     {
         //APCU will do automatically

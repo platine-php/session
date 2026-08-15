@@ -93,6 +93,7 @@ class NullStorage extends AbstractStorage
      * {@inheritdoc}
      * @see SessionHandlerInterface
      */
+    #[\ReturnTypeWillChange]
     public function gc($maxLifetime): bool
     {
         return true;
